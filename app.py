@@ -1,4 +1,3 @@
-
 # app.py
 import os
 import time
@@ -6,6 +5,10 @@ import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
 import PyPDF2
+
+# Initialize Streamlit session state for messages
+if "messages" not in st.session_state:
+    st.session_state["messages"] = []
 
 def create_word(text):
     doc = Document()
@@ -42,10 +45,10 @@ st.set_page_config(
 # 2. Load API key
 # -----------------------------
 load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
+api_key = st.secrets["GOOGLE_API_KEY"]
 
 if not api_key:
-    raise ValueError("❌ GOOGLE_API_KEY not found in .env file")
+    raise ValueError("❌ GOOGLE_API_KEY not found in Streamlit secrets")
 
 genai.configure(api_key=api_key)
 
@@ -151,5 +154,6 @@ if user_input := st.chat_input("💬 Ask me anything about the CV:"):
         st.session_state.messages.append({"role": "assistant", "content": reply})
         st.chat_message("assistant").write(reply)
 
-    except Exception as e:
+    except Exception as e:    
         st.error(f"⚠️ Error: {e}")
+
